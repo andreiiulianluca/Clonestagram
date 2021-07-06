@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import instagramLogo from "assets/instaLogo.png";
 import Post from "components/Post";
+import { db } from "utils/firebase";
+
 const AppContainer = styled.div`
   display: flex;
   align-items: center;
@@ -23,6 +25,13 @@ const Header = styled.div`
 `;
 
 function Home() {
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    db.collection("posts").onSnapshot((snapshot) =>
+      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
+    );
+  }, []);
+
   return (
     <AppContainer>
       {/* header */}
@@ -30,6 +39,9 @@ function Home() {
         <img src={instagramLogo} alt="instagram logo" />
       </Header>
       {/* list of posts */}
+      {posts.map((post) => (
+        <Post key={post.id} username={post.username} imageUrl={post.imageUrl} />
+      ))}
       <Post />
     </AppContainer>
   );
