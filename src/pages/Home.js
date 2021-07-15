@@ -3,6 +3,8 @@ import styled from "styled-components";
 import instagramLogo from "assets/instaLogo.png";
 import Post from "components/Post";
 import { auth, db } from "utils/firebase";
+import DropDown from "components/DropDown";
+import UploadModal from "components/UploadModal";
 
 const AppContainer = styled.div`
   display: flex;
@@ -13,11 +15,15 @@ const AppContainer = styled.div`
 const Header = styled.div`
   width: 100%;
   display: flex;
+  position: sticky;
+  z-index: 5;
+  top: 0;
   justify-content: flex-end;
   align-items: center;
   padding: 12px;
   border-bottom: 1px solid lightgrey;
   margin-bottom: 10px;
+  background-color: white;
 
   img {
     height: 40px;
@@ -31,6 +37,7 @@ const Header = styled.div`
 function Home() {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState("");
+  const [isOpenedModal, setOpenedModal] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
@@ -53,16 +60,21 @@ function Home() {
 
   return (
     <AppContainer>
-      {/* header */}
       <Header>
-        {user?.displayName}
         <img src={instagramLogo} alt="instagram logo" />
+        <DropDown
+          username={user?.displayName}
+          openUploadModal={() => setOpenedModal(true)}
+        />
       </Header>
-      {/* list of posts */}
       {posts.map((post) => (
         <Post key={post.id} username={post.username} imageUrl={post.imageUrl} />
       ))}
-      <Post />
+      <UploadModal
+        isOpened={isOpenedModal}
+        setIsOpen={setOpenedModal}
+        username={user?.displayName}
+      />
     </AppContainer>
   );
 }
