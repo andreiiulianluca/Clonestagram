@@ -4,6 +4,7 @@ import styled from "styled-components";
 import instaLogo from "assets/instaLogo.png";
 import { Input, Button } from "antd";
 import { auth } from "utils/firebase";
+import { useHistory } from "react-router";
 
 const CenteredWrap = styled.div`
   display: flex;
@@ -38,17 +39,29 @@ const LogoContainer = styled.div`
   }
 `;
 
+const Error = styled.span`
+  color: red;
+`;
+
 function SignUp() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
+  const history = useHistory();
+  
   const handleSignUp = () => {
-    auth.createUserWithEmailAndPassword(email, password).then((authUser) =>
-      authUser.user.updateProfile({
-        displayName: username,
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then(async (authUser) => {
+        await authUser.user.updateProfile({
+          displayName: username,
+        });
+
+        history.push("/");
       })
-    );
+      .catch((e) => setErrorMessage(e.message));
   };
   return (
     <CenteredWrap>
@@ -67,18 +80,27 @@ function SignUp() {
         <Input
           placeholder="E-mail"
           type="email"
-          value="email"
+          value={email}
+          autoComplete="username"
           onChange={(e) => setEmail(e.target.value)}
         />
         {/*password*/}
         <Input
           placeholder="Password"
           type="password"
-          value="password"
+          value={password}
+          autoComplete="new-password"
           onChange={(e) => setPassword(e.target.value)}
         />
         {/*sign-up button*/}
-        <Button type="primary">Sign-Up</Button>
+        <Error>{errorMessage}</Error>
+        <Button
+          type="primary"
+          style={{ "margin-left": "35%" }}
+          onClick={handleSignUp}
+        >
+          Sign-Up
+        </Button>
       </SignUpContainer>
     </CenteredWrap>
   );
