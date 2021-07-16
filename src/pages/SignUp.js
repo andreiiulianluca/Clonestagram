@@ -50,7 +50,7 @@ function SignUp() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const history = useHistory();
-  
+
   const handleSignUp = () => {
     auth
       .createUserWithEmailAndPassword(email, password)

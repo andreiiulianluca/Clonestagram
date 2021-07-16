@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Input, Upload, Progress, message } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import firebase, { db, storage } from "utils/firebase";
+import { nanoid } from "nanoid";
 
 function UploadModal({ isOpened, setIsOpen, username }) {
   const [file, setFile] = useState();
@@ -23,7 +24,8 @@ function UploadModal({ isOpened, setIsOpen, username }) {
   };
 
   const handleUpload = () => {
-    const uploadTask = storage.ref(`images/${file.name}`).put(file);
+    const imageName = `${file.name}_${nanoid()}`;
+    const uploadTask = storage.ref(`images/${imageName}`).put(file);
 
     uploadTask.on(
       "stage_changed",
@@ -41,15 +43,20 @@ function UploadModal({ isOpened, setIsOpen, username }) {
       () => {
         storage
           .ref("images")
-          .child(file.name)
+          .child(imageName)
           .getDownloadURL()
-          .then((imageUrl) => {
-            db.collection("posts").add({
+          .then(async (imageUrl) => {
+            await db.collection("posts").add({
               caption: caption,
               username,
               imageUrl,
               timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             });
+
+            setIsOpen(false);
+            setPhotoCaption("");
+            setFile();
+            setProgress(0);
           });
       }
     );

@@ -9,6 +9,7 @@
     "antd": "^4.16.6",
     "firebase": "^8.7.0",
     "history": "^5.0.0",
+    "nanoid": "^3.1.23",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router": "^5.2.0",

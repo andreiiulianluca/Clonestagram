@@ -47,15 +47,16 @@ function Home() {
     return () => unsubscribe();
   }, [user]);
   useEffect(() => {
-    db.collection("posts").onSnapshot((snapshot) =>
-      setPosts(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          username: doc.data().username,
-          imageUrl: doc.data().imageUrl,
-        }))
-      )
-    );
+    db.collection("posts")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) =>
+        setPosts(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+        )
+      );
   }, []);
 
   return (
@@ -68,7 +69,7 @@ function Home() {
         />
       </Header>
       {posts.map((post) => (
-        <Post key={post.id} username={post.username} imageUrl={post.imageUrl} />
+        <Post key={post.id} {...post} />
       ))}
       <UploadModal
         isOpened={isOpenedModal}
